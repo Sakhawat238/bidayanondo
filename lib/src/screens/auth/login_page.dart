@@ -31,7 +31,7 @@ class LoginPageState extends State<LoginPage> {
   }
 
   void login() {
-    if (email == 'ab@xy.com' && password == '1234') {
+    if (email == '130510' && password == '1234') {
       saveAuthData(true);
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
@@ -91,7 +91,7 @@ class LoginPageState extends State<LoginPage> {
       keyboardType: TextInputType.emailAddress,
       autovalidateMode: AutovalidateMode.disabled,
       validator: (String? value) {
-        if (value!.length < 6 ) {
+        if (value!.length >= 6 ) {
           return null;
         } else {
           return 'Shop ID is invalid';
