@@ -7,9 +7,9 @@ class App extends StatelessWidget {
 
   const App({super.key});
 
-   Future<bool?> loadAuthData() async {
+   Future<String?> loadAuthData() async {
      SharedPreferences sp = await SharedPreferences.getInstance();
-     return sp.getBool('auth');
+     return sp.getString('auth');
    }
 
   @override
@@ -21,7 +21,7 @@ class App extends StatelessWidget {
         future: loadAuthData(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            if (snapshot.data != null) {
+            if (snapshot.data != null && snapshot.data != "") {
               return const HomePage();
             } else {
               return const LoginPage();

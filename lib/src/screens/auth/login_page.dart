@@ -25,14 +25,14 @@ class LoginPageState extends State<LoginPage> {
     });
   }
 
-  saveAuthData(bool value) async {
+  saveAuthData(String value) async {
     SharedPreferences sp = await SharedPreferences.getInstance();
-    sp.setBool('auth', value);
+    sp.setString('auth', value);
   }
 
   void login() {
     if (email == '130510' && password == '1234') {
-      saveAuthData(true);
+      saveAuthData('130510');
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (BuildContext context) {
