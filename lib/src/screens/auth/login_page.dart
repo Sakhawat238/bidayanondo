@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../home/home_page.dart';
+import '../../services/http.dart';
+
 
 class LoginPage extends StatefulWidget {
 
@@ -14,6 +16,8 @@ class LoginPage extends StatefulWidget {
 class LoginPageState extends State<LoginPage> {
   String email = "";
   String password = "";
+
+  final HttpService _httpService = HttpService();
 
   final loginFormKey = GlobalKey<FormState>();
   bool _autoValidateLoginForm = false;
@@ -30,9 +34,10 @@ class LoginPageState extends State<LoginPage> {
     sp.setString('auth', value);
   }
 
-  void login() {
-    if (email == '130510' && password == '1234') {
-      saveAuthData('130510');
+  Future<void> login() async {
+    bool res = await _httpService.storeLogin(email, password);
+    if (res == true) {
+      saveAuthData(email);
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (BuildContext context) {
