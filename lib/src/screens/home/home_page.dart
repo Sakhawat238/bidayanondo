@@ -26,12 +26,18 @@ class HomePageState extends State<HomePage> {
   String _code = "";
   String _timestamp = "";
   int _quantity = 0;
-  String _rewardStatus = "P"; // P = pending, N = None, A = Available
+  String _storeCode = "";
+  String _rewardStatus = "P"; // P = pending, N = None, A = Available, C = Claimed
   String _noRewardMessage = "No reward available";
-  final List<Reward> _rewards = List.empty(growable: true);
+  List<Reward> _rewards = List.empty(growable: true);
   List<bool> checkList = List.empty(growable: true);
   Set<int> selectedRewards = {};
 
+
+  void _setStoreCode() async {
+    SharedPreferences sp = await SharedPreferences.getInstance();
+    _storeCode = sp.getString('auth')!;
+  }
 
   void _parseData(String data) {
     if(data != "") {
@@ -82,10 +88,19 @@ class HomePageState extends State<HomePage> {
     });
   }
 
-  void _submitSelectedRewards() {
-    for (int element in selectedRewards) {
-      String el = element.toString();
-      debugPrint(el);
+  void _submitSelectedRewards() async{
+    List<int> rewards = selectedRewards.toList();
+    var res = await _httpService.claimReward(_code, _timestamp, _quantity, _storeCode, rewards);
+    if (res) {
+      setState(() {
+        _rewardStatus = "C";
+        _code = "";
+        _timestamp = "";
+        _quantity = 0;
+        _rewards = [];
+        checkList = [];
+        selectedRewards = {};
+      });
     }
   }
 
@@ -93,6 +108,7 @@ class HomePageState extends State<HomePage> {
   @override
   void initState(){
     _parseAndProcessBarcodeData(widget.barcodeData);
+    _setStoreCode();
     super.initState();
   }
 
@@ -126,7 +142,9 @@ class HomePageState extends State<HomePage> {
           defaultHomeWidget() :
           _rewardStatus == "N" ?
             noRewardWidget() :
-            rewardAvailableWidget(),
+              _rewardStatus == "C"?
+                rewardClaimedWidget():
+                  rewardAvailableWidget(),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.qr_code),
         onPressed: (){
@@ -213,6 +231,21 @@ class HomePageState extends State<HomePage> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget rewardClaimedWidget() {
+    return const Center(
+      widthFactor: 2,
+      heightFactor: 30,
+      child: Text(
+        "Reward claimed successfully",
+        style: TextStyle(
+          color: Colors.black45,
+          fontSize: 20,
+        ),
+        textAlign: TextAlign.center,
+      ),
     );
   }
 }
